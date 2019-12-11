@@ -15,4 +15,8 @@ uninstall:
 clean:
 	rm -rf .build
 
-.PHONY: build install uninstall clean
+# https://forums.swift.org/t/indexstoredb-support-error/28253
+genProject:
+	swift package generate-xcodeproj --xcconfig-overrides overrides.xcconfig
+
+.PHONY: build install uninstall clean genProject
