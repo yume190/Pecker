@@ -67,14 +67,13 @@ Run `pecker` in the project target to detect. Project will be searched Swift fil
 
 ### Rules
 
-Current only 2 rules are included in Pecker, They are `skip_public` and `xctest`, You can also check Source/PeckerKit/Rules directory to see their implementation.
+Current only 5 rules are included in Pecker, They are `skip_public`, `xctest`, `attributes`, `xml`, `comment`. You can add them to ` disabled_rules` if you don't need it. You can also check Source/PeckerKit/Rules directory to see their implementation.
 
 #### skip_public
 This rule means skip detect public class, struct, function, etc. Usually the public code is provided for other users, so it is difficult to determine whether it is used. So we don't detect it by default. But in some cases, such as using `submodule` to organize code, you need to detect public code, you can add it to ` disabled_rules`.
 
 #### xctest
-XCTest is special, we stipulate that ignore classes inherited from XCTestCase and functions of this class that hasPrefix "test" and do not contain parameters. You can add it to ` disabled_rules` if you don't need it.
-
+XCTest is special, we stipulate that ignore classes inherited from XCTestCase and functions of this class that hasPrefix "test" and do not contain parameters. 
 ```swift
 class ExampleUITests: XCTestCase {
 
@@ -84,7 +83,69 @@ class ExampleUITests: XCTestCase {
     func test(name: String) { // unused
     }
     
-    func get() { // unsed
+    func get() { // unused
+    }
+}
+
+```
+
+#### attributes
+If a Declaration contains the attribute in `BlackListAttribute`, skip. Such as `IBAction`, we are continuously collecting, if you find new cases, please let us know.
+
+```swift
+@IBAction func buttonTap(_ sender: Any) { // used
+        
+}
+
+```
+
+#### xml
+If code is used in xib or storyboard, it also means used.
+
+#### comment  
+Code can be ignore with a comment inside a source file with the following format:
+
+* Ignore specified code
+
+```
+// pecker:ignore 
+```
+
+For example:
+
+```swift
+// pecker:ignore
+class TestCommentObject { // skip
+    
+    // pecker:ignore
+    func test1() { // skip
+    }
+    
+    func test2() { // unused
+    }
+}
+
+```
+
+* Ignore all symbols under scope   
+
+```
+// pecker:ignore all
+```
+
+For example:
+
+```swift
+// pecker:ignore all
+class TestCommentObject { // skip
+    
+    func test1() { // skip
+    }
+    
+    struct SubClass { // skip
+        
+        func test2() { // skip
+        }
     }
 }
 
@@ -114,7 +175,7 @@ class Animal {
     }
 }
 
-class Dod: Animal {
+class Dog: Animal {
     override func run() { // used
     }
 }
@@ -139,7 +200,7 @@ extension UnusedExample {
 
 ### Configuration
 
-Configure `pecker` by adding a `.pecker.yml` file from the directory you'll
+This is optinal, will use default, if unspecified. Configure `pecker` by adding a `.pecker.yml` file from the directory you'll
 run `pecker` from. The following parameters can be configured:
 
 Rule inclusion:
@@ -149,7 +210,9 @@ Rule inclusion:
 Reporter inclusion: 
 
 * xcode: Warnings displayed in the IDE.
-* json: Generate a warnings json file.
+* json: Generate a json file named `pecker.result.json`, you can set path by `output_file`, if unspecified, the default is current project directory path.
+
+   ![屏幕快照 2019-12-13 下午9.49.09.png](https://upload-images.jianshu.io/upload_images/2086987-29dbe4bb76af16ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ```yaml
 reporter: "xcode"
@@ -170,6 +233,8 @@ blacklist_files: # files to ignore during detecting, only need to add file name,
 blacklist_symbols: # symbols to ignore during detecting, contains class, struct, enum, etc.
   - AppDelegate
   - viewDidLoad
+
+output_file: "/Users/ming/Desktop/PeckerResultDirectory"
 ```
 
   

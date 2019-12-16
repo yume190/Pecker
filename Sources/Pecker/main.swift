@@ -13,14 +13,14 @@ fileprivate func main(_ arguments: [String]) -> Int32 {
             let configuration = try createConfiguration(options: options)
             let analyzer = try Analyzer(configuration: configuration)
             let unusedSources = try analyzer.analyze()
-            configuration.reporter.report(sources: unusedSources)
+            configuration.reporter.report(configuration, sources: unusedSources)
         } catch {
             log(error.localizedDescription, level: .error)
             return 1
         }
         return 0
     case .version:
-        print("0.0.4")
+        print("0.0.9")
         return 0
     }
 }

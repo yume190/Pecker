@@ -20,6 +20,12 @@ struct RuleFactory {
             return SkipPublicRule()
         case .xctest:
             return XCTestRule()
+        case .attributes:
+            return AttributesRule()
+        case .xml:
+            return XMLRule()
+        case .comment:
+            return CommentRule()
         }
     }
 }
